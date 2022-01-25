@@ -1,52 +1,93 @@
-const number_btn = document.querySelectorAll(".number_btn");
-const operator_btn = document.querySelectorAll(".operator_unit");  
+const buttons = document.querySelector(".pad");
+const operators = document.querySelector(".operator_unit");
 const input = document.querySelector(".input");
 
-let n1 = "";
-let n2 = "";
-let ope ="";
-
-function addNumber(event) {
-    
-    if(ope === "") {
-        let n1 = event.target.innerText;
-        input.value += n1;
-        n1 = input.value;
-        console.log(n1);
-    } else if(ope === true) {
-        n2 = event.target.innerText - n1;
-        
-        function oper_value(event) {
-            ope = event.target.innerText;
-        
-            function result(n1, n2) {
-                console.log(operator(n1, n2));
-            };
-        
-            result(n1, n2);
-        };
-        
-        
-        Array.from(operator_btn).forEach(oper_btn => oper_btn.addEventListener("click", oper_value));
+let firstNum = "";
+let lastNum = "";
+let operator = "";
+let lastNumKey = "";
 
 
-        console.log(n2);
-        if(ope === "+") {
-            result =  Number(n1) + Number(n2);
-        } 
-        else if(ope === "-") {
-            result =  Number(n1) - Number(n2);
-        } 
-        else if(ope === "×") {
-            result =  Number(n1) * Number(n2);
-        } 
-        else if(ope === "÷") {
-            result =  Number(n1) / Number(n2);
+
+function calculator(n1, ope, n2) {
+    let result = "0";
+    if(ope === "+") {
+        result = Number(n1) + Number(n2);
+    }
+    else if(ope === "-") {
+        result = Number(n1) - Number(n2);
+    }
+    else if(ope === "×") {
+        result = Number(n1) * Number(n2);
+    }
+    else if(ope === "÷") {
+        result = Number(n1) / Number(n2);
+    }
+    return String(result);
+}
+
+
+
+function clickBtn(event) {
+    const btn = event.target;
+    const btnClass = btn.classList[0];
+    const btnText = btn.innerText;
+
+    if(btn.matches("button")) {
+        if(btnClass === "number_btn") {
+            if(input.textContent ===  "0" && operator === "") {
+                input.textContent = btnText;
+                firstNum = input.textContent;
+            }
+            else if(input.textContent !== "0" && operator === "") {
+                input.textContent = input.textContent + btnText;
+                firstNum = input.textContent;
+            }
+            else if(input.textContent !== "0" && operator !== "") {
+                if(lastNumKey === operator) {
+                    input.textContent = btnText;
+                    lastNum = input.textContent;
+                    lastNumKey = input.textContent;
+                }
+                else if(lastNumKey !== operator) {
+                    input.textContent = input.textContent + btnText;
+                    lastNum = input.textContent;
+                }
+            }
         }
-        return result;
+        else if(btnClass === "operator_unit") {
+            operator = btnText;
+            lastNumKey = operator;
+        }
+        else if(btnClass === "clear") {
+            firstNum = "";
+            lastNum = "";
+            operator = "";
+            lastNumKey = "";
+            input.textContent = "0";
+        }
+        else if(btnClass === "calculate") {
+            if(firstNum !== "" && operator === "") {
+                input.textContent = firstNum;
+            }
+            else if(firstNum !== "" && lastNum === "") {
+                input.textContent = calculator(input.textContent, operator, input.textContent)
+            }
+            else if(lastNumKey === input.textContent) {
+                input.textContent = calculator(firstNum, operator, lastNum)
+            }
+            else if(lastNumKey !== input.textContent && lastNum !== "") {
+                input.textContent = calculator(firstNum, operator, lastNum)
+            }
+            else if(lastNumKey !== input.textContent && lastNum === "") {
+                input.textContent = firstNum;
+            }
+        }
     }
 }
 
 
-Array.from(number_btn).forEach(num => num.addEventListener("click", addNumber));
 
+
+
+buttons.addEventListener("click", clickBtn);
